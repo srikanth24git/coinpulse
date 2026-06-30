@@ -4,9 +4,16 @@ import DataTable from "../DataTable";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import TrendingCoinsFallback from "./TrendingCoinsFallback";
 
 const TrendingCoins = async () => {
-  const trendingCoins = await fetcher<TrendingCoinsResponse>("search/trending");
+  let trendingCoins;
+  try {
+    trendingCoins = await fetcher<TrendingCoinsResponse>("search/trending");
+  } catch (error) {
+    console.error("Error fetching trending coins:", error);
+    return <TrendingCoinsFallback />;
+  }
 
   const columns: DataTableColumn<TrendingCoin>[] = [
     {
@@ -61,7 +68,7 @@ const TrendingCoins = async () => {
         <p className="mb-4">Trending Coins</p>
 
         <DataTable
-          data={trendingCoins.coins.slice(0, 5) || []}
+          data={(trendingCoins.coins ?? []).slice(0, 5)}
           columns={columns}
           rowKey={(coin) => coin.item.id}
           headerCellClassName="py-3!"
