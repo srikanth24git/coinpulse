@@ -214,14 +214,17 @@
       @apply flex gap-1 xl:gap-2 items-center;
     }
 
-    .config-button {
-      @apply rounded-sm border-0 cursor-pointer px-2.5 py-2 text-xs xl:text-sm text-purple-100 hover:bg-dark-400 hover:text-white;
+   .config-button {
+      @apply px-3 py-1 rounded-md text-purple-100/60 transition-all;
     }
 
-    .config-button-active {
-      @apply rounded-sm px-2.5 py-1.5 border-0 cursor-pointer text-sm text-gray-900 bg-green-500;
-    }
+    .config-button:hover {
+      @apply bg-dark-400 text-white;
+    } 
 
+    .config-button.active {
+      @apply bg-purple-600 text-white;
+    }
     .chart {
       @apply w-full min-h-50;
     }
