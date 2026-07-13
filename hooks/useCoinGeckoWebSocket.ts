@@ -5,14 +5,13 @@ import { Command } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const WS_BASE = `${process.env.NEXT_PUBLIC_COINGECKO_WEBSOCKET_URL}?
-x-cg-demo-api-key=${process.env.NEXTPUBLIC_COIN_GECKO_API_KEY}`;
+x-cg-demo-api-key=${process.env.NEXT_PUBLIC_COINGECKO_API_KEY}`;
 
 export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocketProps
 ) : UseCoinGeckoWebSocketReturn => {
 
     const wsRef = useRef<WebSocket | null>(null);
-    const subscribed = useRef(<Set<string>>new Set());
-
+    const subscribed = useRef<Set<string>>(new Set());
     const [price, setPrice] = useState<ExtendedPriceData | null>(null);
     const [trades, setTrades] = useState<Trade[]>([]);
     const [ohlcv, setOhlcv] = useState<OHLCData | null>(null);
@@ -21,6 +20,27 @@ export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocket
 
     useEffect(() => {
         const ws = new WebSocket(WS_BASE);
+
+        wsRef.current = ws;
+
+        console.log("Connecting to:", WS_BASE);
+
+        ws.onopen = () => {
+            console.log("WebSocket OPEN");
+            setIsWsReady(true);
+        };
+
+        ws.onclose = (event) => {
+            console.log("WebSocket CLOSED", event);
+            setIsWsReady(false);
+        };
+
+        ws.onerror = (error) => {
+        console.log("WebSocket ERROR", error);
+        };
+
+
+        
 
         const send = (payLoad: Record<string, unknown>) => ws.send(JSON.stringify(payLoad));
         
@@ -65,26 +85,41 @@ export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocket
 
             }
 
-            if(msg.type === 'G3'){
-                const timestamp = msg.t ?? 0;
+            if (msg.type === "G3") {
+    console.log("Received G3", msg);
 
-                const candle: OHLCData = 
-                [timestamp, Number(msg.o ?? 0), Number(msg.h ?? 0), Number(msg.l ?? 0), Number(msg.c ?? 0)];
+    const timestamp = msg.t ?? 0;
 
-                setOhlcv(candle);
-            }
+    const candle: OHLCData = [
+        timestamp,
+        Number(msg.o ?? 0),
+        Number(msg.h ?? 0),
+        Number(msg.l ?? 0),
+        Number(msg.c ?? 0),
+    ];
+
+    console.log("New candle", candle);
+
+    setOhlcv(candle);
+}
 
 
         };
 
-        ws.onopen = () => setIsWsReady(true);
-
-        ws.onmessage = handleMessage;
+        ws.onopen = () => {
+            console.log("✅ WebSocket OPEN");
+            setIsWsReady(true);
+        };
+        
+        ws.onmessage = (event) => {
+            console.log("📨", event.data);
+            handleMessage(event);
+        };
 
         ws.onclose = () => setIsWsReady(false);
 
         ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
+            // console.error('WebSocket error:', error);
             setIsWsReady(false);
         }
 
@@ -130,6 +165,12 @@ export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocket
             setOhlcv(null);
 
             unsubscribeAll();
+
+            console.log({
+                coinId,
+                poolId,
+                isWsReady
+            });
 
             subscribe('CGSimplePrice', { coin_id: [coinId], action: 'set_tokens'});
         });

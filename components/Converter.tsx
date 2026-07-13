@@ -21,27 +21,28 @@ const Converter = ({ symbol, icon, priceList }: ConverterProps) => {
   const convertedPrice = (parseFloat(amount) || 0) * (priceList[currency] || 0);
 
   return (
-    <div id="convertor">
-      <h4>{symbol.toUpperCase()} Convertor</h4>
-      <div className="panel"></div>
-      <div className="input-wrapper">
-        <Input
-          type="number"
-          placeholder="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="input"
-        />
-        <div className="coin-info">
-          <Image src={icon} alt={symbol} width={20} height={20} />
-          <p>{symbol.toUpperCase()}</p>
+    <div id="converter">
+      <h4>{symbol.toUpperCase()} Converter</h4>
+      <div className="panel">
+        <div className="input-wrapper">
+          <Input
+            type="number"
+            placeholder="Amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="input"
+          />
+          <div className="coin-info">
+            <Image src={icon} alt={symbol} width={20} height={20} />
+            <p>{symbol.toUpperCase()}</p>
+          </div>
         </div>
-      </div>
-      <div className="divider">
-        <div className="line">
+        <div className="divider">
+          <div className="line" />
+
           <Image
-            src="/convertor.svg"
-            alt="convertor"
+            src="/converter.svg"
+            alt="converter"
             width={32}
             height={32}
             className="icon"
@@ -56,6 +57,7 @@ const Converter = ({ symbol, icon, priceList }: ConverterProps) => {
                 {currency.toUpperCase()}
               </SelectValue>
             </SelectTrigger>
+
             <SelectContent className="select-content" data-converter>
               {Object.keys(priceList).map((currencyCode) => (
                 <SelectItem
