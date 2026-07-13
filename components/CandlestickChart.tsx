@@ -7,6 +7,7 @@ import { fetcher } from "../lib/coingecko.actions";
 import { getCandlestickConfig } from "../constants";
 import { CandlestickSeries } from "lightweight-charts";
 import { convertOHLCData } from "../lib/utils";
+import type { UTCTimestamp } from "lightweight-charts";
 
 const getChartConfig = (height: number, showTime: boolean) => ({
   height,
@@ -36,6 +37,10 @@ const CandlestickChart = ({
   coinId,
   height = 360,
   initialPeriod = "daily",
+  mode = "historical",
+  livePrice,
+  updateInterval = 10000,
+  onUpdateIntervalChange,
 }: CandlestickChartProps) => {
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -43,6 +48,8 @@ const CandlestickChart = ({
 
   const [period, setPeriod] = useState(initialPeriod);
   const [ohlcData, setOhlcData] = useState<OHLCData[]>(data ?? []);
+  const latestCandleRef = useRef<OHLCData | null>(null);
+  const previousPriceRef = useRef<number | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const fetchOHLCData = async (selectedPeriod: Period) => {
@@ -116,6 +123,27 @@ const CandlestickChart = ({
   }, [height, period]);
 
   useEffect(() => {
+    if (mode !== "live") return;
+
+    const interval = setInterval(async () => {
+      try {
+        const { days } = PERIOD_CONFIG[period];
+
+        const latest = await fetcher<OHLCData[]>(`coins/${coinId}/ohlc`, {
+          vs_currency: "usd",
+          days,
+        });
+
+        setOhlcData(latest ?? []);
+      } catch (err) {
+        console.error(err);
+      }
+    }, updateInterval);
+
+    return () => clearInterval(interval);
+  }, [coinId, period, mode, updateInterval]);
+
+  useEffect(() => {
     if (!candleSeriesRef.current) return;
 
     const convertedToSeconds = ohlcData.map(
@@ -131,8 +159,119 @@ const CandlestickChart = ({
 
     const converted = convertOHLCData(convertedToSeconds);
     candleSeriesRef.current.setData(converted);
+
+    if (ohlcData.length > 0) {
+      latestCandleRef.current = [...ohlcData].pop() ?? null;
+    }
+
+    if (ohlcData.length > 0) {
+      latestCandleRef.current = ohlcData[ohlcData.length - 1];
+    }
+
     chartRef.current?.timeScale().fitContent();
   }, [ohlcData, period]);
+
+  useEffect(() => {
+    if (mode !== "live") return;
+    if (!livePrice) return;
+    if (!latestCandleRef.current) return;
+    if (!candleSeriesRef.current) return;
+
+    // console.log("Updating candle:", livePrice);
+
+    const previous = latestCandleRef.current;
+
+    const updated: OHLCData = [
+      previous[0], // keep same timestamp
+      previous[1], // same open
+      Math.max(previous[2], livePrice), // high
+      Math.min(previous[3], livePrice), // low
+      livePrice, // close
+    ];
+
+    latestCandleRef.current = updated;
+
+    const converted = convertOHLCData([
+      [
+        Math.floor(updated[0] / 1000),
+        updated[1],
+        updated[2],
+        updated[3],
+        updated[4],
+      ],
+    ])[0];
+
+    candleSeriesRef.current.update(converted);
+  }, [livePrice, mode]);
+
+  // useEffect(() => {
+  //   if (!livePrice) return;
+  //   if (!candleSeriesRef.current) return;
+
+  //   const now = Math.floor(Date.now() / 1000);
+
+  //   // first update
+  //   if (!latestCandleRef.current) {
+  //     latestCandleRef.current = [
+  //       now * 1000,
+  //       livePrice,
+  //       livePrice,
+  //       livePrice,
+  //       livePrice,
+  //     ];
+
+  //     previousPriceRef.current = livePrice;
+
+  //     candleSeriesRef.current.update({
+  //       time: now as UTCTimestamp,
+  //       open: livePrice,
+  //       high: livePrice,
+  //       low: livePrice,
+  //       close: livePrice,
+  //     });
+
+  //     return;
+  //   }
+
+  //   const candle = latestCandleRef.current;
+
+  //   candle[2] = Math.max(candle[2], livePrice); // high
+  //   candle[3] = Math.min(candle[3], livePrice); // low
+  //   candle[4] = livePrice; // close
+
+  //   candleSeriesRef.current.update({
+  //     time: Math.floor(candle[0] / 1000) as UTCTimestamp,
+  //     open: candle[1],
+  //     high: candle[2],
+  //     low: candle[3],
+  //     close: candle[4],
+  //   });
+  //   chartRef.current?.timeScale().scrollToRealTime();
+
+  //   previousPriceRef.current = livePrice;
+  // }, [livePrice]);
+
+  useEffect(() => {
+    if (mode !== "live") return;
+
+    const interval = setInterval(() => {
+      if (!latestCandleRef.current) return;
+
+      const lastClose = latestCandleRef.current[4];
+
+      latestCandleRef.current = [
+        Date.now(),
+        lastClose,
+        lastClose,
+        lastClose,
+        lastClose,
+      ];
+
+      // console.log("🕯 New candle created");
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [mode]);
 
   return (
     <div id="candlestick-chart">
@@ -157,6 +296,17 @@ const CandlestickChart = ({
           ))}
         </div>
       </div>
+
+      <select
+        value={updateInterval}
+        onChange={(e) => onUpdateIntervalChange?.(Number(e.target.value))}
+        className="config-select"
+      >
+        <option value={5000}>5s</option>
+        <option value={10000}>10s</option>
+        <option value={30000}>30s</option>
+        <option value={60000}>1m</option>
+      </select>
       <div ref={chartContainerRef} className="chart" style={{ height }} />
     </div>
   );

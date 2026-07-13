@@ -7,12 +7,14 @@ interface NextPageProps {
 
 interface CandlestickChartProps {
   data?: OHLCData[];
-  liveOhlcv?: OHLCData | null;
   coinId: string;
   height?: number;
   children?: React.ReactNode;
   mode?: "historical" | "live";
   initialPeriod?: Period;
+  livePrice?: number;
+  updateInterval?: number;
+  onUpdateIntervalChange?: (value: number) => void;
 }
 
 interface ConverterProps {
@@ -199,23 +201,46 @@ interface CoinDetailsData {
       usd: number;
       [key: string]: number;
     };
+
     price_change_24h_in_currency: {
       usd: number;
     };
+
     price_change_percentage_24h_in_currency: {
       usd: number;
     };
+
     price_change_percentage_30d_in_currency: {
       usd: number;
     };
+
     market_cap: {
       usd: number;
     };
+
     total_volume: {
+      usd: number;
+    };
+
+    circulating_supply: number;
+    total_supply: number | null;
+    max_supply: number | null;
+
+    fully_diluted_valuation: {
+      usd: number;
+    };
+
+    ath: {
+      usd: number;
+    };
+
+    atl: {
       usd: number;
     };
   };
   market_cap_rank: number;
+  genesis_date: string | null;
+  hashing_algorithm: string | null;
   description: {
     en: string;
   };
