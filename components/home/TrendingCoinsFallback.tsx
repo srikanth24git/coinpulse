@@ -1,17 +1,18 @@
 import DataTable from "../DataTable";
+import { Skeleton } from "../ui/skeleton";
 
 const columns = [
   {
     header: "Name",
-    cell: () => <div className="h-5 w-32 bg-white/10 rounded" />,
+    cell: () => <Skeleton className="category-skeleton" />,
   },
   {
     header: "24h",
-    cell: () => <div className="h-5 w-20 bg-white/10 rounded" />,
+    cell: () => <Skeleton className="value-skeleton-md" />,
   },
   {
     header: "Price",
-    cell: () => <div className="h-5 w-24 bg-white/10 rounded" />,
+    cell: () => <Skeleton className="value-skeleton-lg" />,
   },
 ];
 

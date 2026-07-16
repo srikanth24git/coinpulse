@@ -12,22 +12,34 @@ export function formatCurrency(
   currency?: string,
   showSymbol?: boolean,
 ) {
-  if (value === null || value === undefined || isNaN(value)) {
-    return showSymbol !== false ? '$0.00' : '0.00';
+  if (value === null || value ===undefined || isNaN(value)) {
+    return showSymbol !== false ? "$0.00" : "0.00";
   }
 
+  const locale = "en-US";
+
   if (showSymbol === undefined || showSymbol === true) {
-    return value.toLocaleString(undefined, {
-      style: 'currency',
-      currency: currency?.toUpperCase() || 'USD',
+    return value.toLocaleString(locale, {
+      style: "currency",
+      currency: currency?.toUpperCase() || "USD",
       minimumFractionDigits: digits ?? 2,
       maximumFractionDigits: digits ?? 2,
     });
   }
-  return value.toLocaleString(undefined, {
+
+  return value.toLocaleString(locale, {
     minimumFractionDigits: digits ?? 2,
     maximumFractionDigits: digits ?? 2,
   });
+}
+
+export function formatLargeNumber(value: number | null |undefined) {
+  if (value === null || value === undefined) return "-";
+
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
 export function formatPercentage(change: number | null | undefined): string {

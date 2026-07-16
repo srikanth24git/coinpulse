@@ -23,20 +23,20 @@ export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocket
 
         wsRef.current = ws;
 
-        console.log("Connecting to:", WS_BASE);
+        // console.log("Connecting to:", WS_BASE);
 
         ws.onopen = () => {
-            console.log("WebSocket OPEN");
+            // console.log("WebSocket OPEN");
             setIsWsReady(true);
         };
 
         ws.onclose = (event) => {
-            console.log("WebSocket CLOSED", event);
+            // console.log("WebSocket CLOSED", event);
             setIsWsReady(false);
         };
 
         ws.onerror = (error) => {
-        console.log("WebSocket ERROR", error);
+        // console.log("WebSocket ERROR", error);
         };
 
 
@@ -86,7 +86,7 @@ export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocket
             }
 
             if (msg.type === "G3") {
-    console.log("Received G3", msg);
+    // console.log("Received G3", msg);
 
     const timestamp = msg.t ?? 0;
 
@@ -107,12 +107,12 @@ export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocket
         };
 
         ws.onopen = () => {
-            console.log("✅ WebSocket OPEN");
+            // console.log("✅ WebSocket OPEN");
             setIsWsReady(true);
         };
         
         ws.onmessage = (event) => {
-            console.log("📨", event.data);
+            // console.log("📨", event.data);
             handleMessage(event);
         };
 
@@ -166,11 +166,11 @@ export const useCoinGeckoWebSocket = ({ coinId, poolId } : UseCoinGeckoWebSocket
 
             unsubscribeAll();
 
-            console.log({
-                coinId,
-                poolId,
-                isWsReady
-            });
+            // console.log({
+            //     coinId,
+            //     poolId,
+            //     isWsReady
+            // });
 
             subscribe('CGSimplePrice', { coin_id: [coinId], action: 'set_tokens'});
         });

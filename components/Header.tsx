@@ -10,7 +10,7 @@ const Header = () => {
   return (
     <header>
       <div className="main-container inner">
-        <Link href="/">
+        <Link href="/" className="transition hover:scale-[1.02]">
           <Image src="/logo.svg" alt="CoinPulse Logo" width={132} height={40} />
         </Link>
 

@@ -1,13 +1,20 @@
 "use client";
 
 import { PERIOD_BUTTONS, PERIOD_CONFIG } from "../constants";
-import { useState, useRef, useTransition, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useTransition,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { createChart, IChartApi, ISeriesApi } from "lightweight-charts";
 import { fetcher } from "../lib/coingecko.actions";
 import { getCandlestickConfig } from "../constants";
 import { CandlestickSeries } from "lightweight-charts";
 import { convertOHLCData } from "../lib/utils";
-import type { UTCTimestamp } from "lightweight-charts";
+// import type { UTCTimestamp } from "lightweight-charts";
 
 const getChartConfig = (height: number, showTime: boolean) => ({
   height,
@@ -49,33 +56,53 @@ const CandlestickChart = ({
   const [period, setPeriod] = useState(initialPeriod);
   const [ohlcData, setOhlcData] = useState<OHLCData[]>(data ?? []);
   const latestCandleRef = useRef<OHLCData | null>(null);
-  const previousPriceRef = useRef<number | null>(null);
+  // const previousPriceRef = useRef<number | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const fetchOHLCData = async (selectedPeriod: Period) => {
-    try {
-      const { days } = PERIOD_CONFIG[selectedPeriod];
+  const convertedChartData = useMemo(() => {
+    const convertedToSeconds = ohlcData.map(
+      (item) =>
+        [
+          Math.floor(item[0] / 1000),
+          item[1],
+          item[2],
+          item[3],
+          item[4],
+        ] as OHLCData,
+    );
 
-      console.log(PERIOD_CONFIG[selectedPeriod]);
+    return convertOHLCData(convertedToSeconds);
+  }, [ohlcData]);
 
-      const newData = await fetcher<OHLCData[]>(`coins/${coinId}/ohlc`, {
-        vs_currency: "usd",
-        days,
+  const fetchOHLCData = useCallback(
+    async (selectedPeriod: Period) => {
+      try {
+        const { days } = PERIOD_CONFIG[selectedPeriod];
+
+        const newData = await fetcher<OHLCData[]>(`coins/${coinId}/ohlc`, {
+          vs_currency: "usd",
+          days,
+        });
+
+        setOhlcData(newData ?? []);
+      } catch (e) {
+        console.error("Failed to fetch OHLCData", e);
+      }
+    },
+    [coinId],
+  );
+
+  const handlePeriodChange = useCallback(
+    (newPeriod: Period) => {
+      if (newPeriod === period) return;
+
+      startTransition(async () => {
+        setPeriod(newPeriod);
+        await fetchOHLCData(newPeriod);
       });
-      setOhlcData(newData ?? []);
-    } catch (e) {
-      console.error("Failed to fetch OHLCData", e);
-    }
-  };
-
-  const handlePeriodChange = (newPeriod: Period) => {
-    if (newPeriod === period) return;
-
-    startTransition(async () => {
-      setPeriod(newPeriod);
-      await fetchOHLCData(newPeriod);
-    });
-  };
+    },
+    [period, fetchOHLCData],
+  );
 
   useEffect(() => {
     const container = chartContainerRef.current;
@@ -101,7 +128,7 @@ const CandlestickChart = ({
         ] as OHLCData,
     );
 
-    series.setData(convertOHLCData(convertedToSeconds));
+    series.setData(convertedChartData);
     chart.timeScale().fitContent();
 
     chartRef.current = chart;
@@ -120,7 +147,7 @@ const CandlestickChart = ({
       chartRef.current = null;
       candleSeriesRef.current = null;
     };
-  }, [height, period]);
+  }, [height]);
 
   useEffect(() => {
     if (mode !== "live") return;
@@ -146,23 +173,7 @@ const CandlestickChart = ({
   useEffect(() => {
     if (!candleSeriesRef.current) return;
 
-    const convertedToSeconds = ohlcData.map(
-      (item) =>
-        [
-          Math.floor(item[0] / 1000),
-          item[1],
-          item[2],
-          item[3],
-          item[4],
-        ] as OHLCData,
-    );
-
-    const converted = convertOHLCData(convertedToSeconds);
-    candleSeriesRef.current.setData(converted);
-
-    if (ohlcData.length > 0) {
-      latestCandleRef.current = [...ohlcData].pop() ?? null;
-    }
+    candleSeriesRef.current.setData(convertedChartData);
 
     if (ohlcData.length > 0) {
       latestCandleRef.current = ohlcData[ohlcData.length - 1];
@@ -307,7 +318,11 @@ const CandlestickChart = ({
         <option value={30000}>30s</option>
         <option value={60000}>1m</option>
       </select>
-      <div ref={chartContainerRef} className="chart" style={{ height }} />
+      <div
+        ref={chartContainerRef}
+        className="chart fade-up"
+        style={{ height }}
+      />
     </div>
   );
 };

@@ -307,13 +307,7 @@
 
     .market-cap-cell {
       @apply font-medium;
-    }
-
-    .volume-cell {
-      @apply font-medium;
-    }
-  }
-
+  
   #trending-coins {
     @apply pt-8 w-full bg-dark-500 rounded-xl overflow-hidden;
 
@@ -355,7 +349,7 @@
   }
 
   .home-grid {
-    @apply grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 items-start lg:items-center gap-6;
+    @apply grid grid-cols-1 lg:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 items-start lg:items-center gap-6;
   }
 
   #categories-fallback {
@@ -446,9 +440,15 @@
     }
 
     .chart-skeleton {
-      @apply h-full w-full rounded-xl;
+  @apply w-full rounded-xl;
+}
+  }  }
+
+    .volume-cell {
+      @apply font-medium;
     }
   }
+
 
   #trending-coins-fallback {
     @apply w-full flex flex-col justify-center h-full py-4 bg-dark-500 rounded-xl;
@@ -503,7 +503,7 @@
   }
 
   #coin-details-page {
-    @apply py-12 px-4 sm:px-6 mx-auto max-w-360 size-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 items-center gap-6 xl:gap-10 justify-center;
+    @apply py-12 px-4 sm:px-6 mx-auto max-w-360 size-full grid grid-cols-1 lg:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 items-start gap-6 xl:gap-10 justify-center;
 
     .primary {
       @apply size-full xl:col-span-2;
@@ -522,15 +522,20 @@
     }
 
     .exchange-table {
-      @apply bg-dark-500 rounded-xl overflow-hidden mt-5;
+      @apply grid gap-4;
+  @apply bg-dark-500 rounded-xl overflow-hidden mt-5 max-h-[520px] overflow-y-auto;
 
       .exchange-name {
-        @apply text-green-500 font-bold;
+  @apply text-green-500 font-bold;
 
-        a {
-          @apply absolute inset-0 z-10;
-        }
-      }
+  a {
+    @apply hover:text-green-400 transition;
+  }
+}
+
+.exchange-table thead {
+  @apply sticky top-0 bg-dark-500 z-10;
+}
 
       .pair {
         @apply font-medium h-full flex gap-1 py-4 pr-5 space-x-2;
@@ -550,17 +555,24 @@
     }
 
     .details {
-      @apply w-full mt-8 space-y-4;
-
+      @apply mt-5;
       h4 {
         @apply text-xl md:text-2xl font-semibold mb-2 pb-3;
       }
 
       .details-grid {
-        @apply rounded-lg grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 sm:gap-5;
+        @apply grid gap-4;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
 
         li {
-          @apply text-base bg-dark-500 px-5 py-6 rounded-lg flex flex-col gap-3;
+          @apply text-base bg-dark-500 px-5 py-6 rounded-lg flex flex-col gap-3 min-h-[130px];
+
+  transition: all .2s ease;
+  .details-grid li:hover {
+  transform: translateY(-4px) scale(1.015);
+  border: 1px solid rgb(34 197 94 / .35);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
 
           .label {
             @apply text-purple-100;
@@ -769,7 +781,7 @@
     }
 
     .tabs-content {
-      @apply gap-4! mt-2! md:gap-5! sm:grid-cols-2! lg:grid-cols-1! grid!;
+      @apply gap-4! mt-2! md:gap-5! sm:grid-cols-1 md:grid-cols-2! lg:grid-cols-1! grid!;
     }
   }
 
@@ -968,4 +980,19 @@
 
 .custom-scrollbar [data-slot='table-container']::-webkit-scrollbar-thumb:hover {
   background: #171a34;
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp .35s ease-out;
 }
