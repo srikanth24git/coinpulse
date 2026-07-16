@@ -29,10 +29,11 @@ interface Ticker {
   };
   base: string;
   target: string;
-  converted_last: {
+  last: number;
+  volume: number;
+  converted_volume?: {
     usd: number;
   };
-  timestamp: string;
   trade_url: string;
 }
 

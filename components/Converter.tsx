@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
+import AnimatedPrice from "./AnimatedPrice";
 
 import {
   Select,
@@ -21,7 +22,7 @@ const Converter = ({ symbol, icon, priceList }: ConverterProps) => {
   const convertedPrice = (parseFloat(amount) || 0) * (priceList[currency] || 0);
 
   return (
-    <div id="converter">
+    <div id="converter" className="fade-up">
       <h4>{symbol.toUpperCase()} Converter</h4>
       <div className="panel">
         <div className="input-wrapper">
@@ -49,7 +50,7 @@ const Converter = ({ symbol, icon, priceList }: ConverterProps) => {
           />
         </div>
         <div className="output-wrapper">
-          <p>{formatCurrency(convertedPrice, 2, currency, false)}</p>
+          <AnimatedPrice value={convertedPrice} currency={currency} />
 
           <Select value={currency} onValueChange={setCurrency}>
             <SelectTrigger className="select-trigger" value={currency}>

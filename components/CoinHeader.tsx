@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import React from "react";
+import AnimatedPrice from "./AnimatedPrice";
 
 const CoinHeader = ({
   livePriceChangePercentage24h,
@@ -48,7 +49,7 @@ const CoinHeader = ({
         <Image src={image} alt={name} width={77} height={77} />
 
         <div className="price-row">
-          <h1>{formatCurrency(livePrice)}</h1>
+          <AnimatedPrice value={livePrice ?? 0} />
           <Badge
             className={cn("badge", isTrendingUp ? "badge-up" : "badge-down")}
           >

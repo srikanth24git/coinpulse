@@ -1,43 +1,33 @@
 import DataTable from "../DataTable";
+import { Skeleton } from "../ui/skeleton";
 
 const CategoriesFallback = () => {
   const columns = [
     {
       header: "Category",
-      cell: () => (
-        <div className="h-5 w-28 rounded bg-dark-400 animate-pulse" />
-      ),
+      cell: () => <Skeleton className="category-skeleton" />,
     },
     {
       header: "Top-Gainers",
       cell: () => (
         <div className="flex gap-2">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="w-7 h-7 rounded-full bg-dark-400 animate-pulse"
-            />
+            <Skeleton key={i} className="coin-skeleton" />
           ))}
         </div>
       ),
     },
     {
       header: "24h Change",
-      cell: () => (
-        <div className="h-5 w-16 rounded bg-dark-400 animate-pulse" />
-      ),
+      cell: () => <Skeleton className="value-skeleton-sm" />,
     },
     {
       header: "Market Cap",
-      cell: () => (
-        <div className="h-5 w-20 rounded bg-dark-400 animate-pulse" />
-      ),
+      cell: () => <Skeleton className="value-skeleton-md" />,
     },
     {
       header: "24h Volume",
-      cell: () => (
-        <div className="h-5 w-20 rounded bg-dark-400 animate-pulse" />
-      ),
+      cell: () => <Skeleton className="value-skeleton-md" />,
     },
   ];
 

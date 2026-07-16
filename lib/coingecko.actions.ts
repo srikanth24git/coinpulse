@@ -26,7 +26,7 @@ export async function fetcher<T>(
     },{skipEmptyString: true, skipNull: true});
 
 
-    console.log("URL:", url);
+    // console.log("URL:", url);
     const response = await fetch(url, {
         headers: {
         "x-cg-demo-api-key": VALID_API_KEY,
@@ -38,8 +38,8 @@ export async function fetcher<T>(
     if (!response.ok) {
         const text = await response.text();
 
-        console.log("Status:", response.status);
-        console.log("Response:", text);
+        // console.log("Status:", response.status);
+        // console.log("Response:", text);
 
         throw new Error(`API Error: ${response.status}: ${text}`);
     }
@@ -69,7 +69,7 @@ export async function getPools(
       return poolData.data?.[0] ?? fallback;
 
     } catch(error) {
-      console.log(error);
+      // console.log(error);
       return fallback;
     }
   }

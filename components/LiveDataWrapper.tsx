@@ -47,14 +47,14 @@ const LiveDataWrapper = ({
             latest.market_data.price_change_percentage_24h_in_currency.usd,
         });
 
-        console.log(
-          "Previous:",
-          liveMarketData.price,
-          "New:",
-          latest.market_data.current_price.usd,
-        );
+        // console.log(
+        //   "Previous:",
+        //   liveMarketData.price,
+        //   "New:",
+        //   latest.market_data.current_price.usd,
+        // );
 
-        console.log("Latest REST price:", latest.market_data.current_price.usd);
+        // console.log("Latest REST price:", latest.market_data.current_price.usd);
       } catch (error) {
         console.error("Polling error:", error);
       }
@@ -119,7 +119,7 @@ const LiveDataWrapper = ({
   ];
 
   return (
-    <section id="live-data-wrapper">
+    <section id="live-data-wrapper" className="fade-up">
       <CoinHeader
         name={coin.name}
         image={coin.image.large}

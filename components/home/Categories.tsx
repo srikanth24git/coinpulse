@@ -55,7 +55,7 @@ const Categories = async () => {
     },
   ];
   return (
-    <div id="categories" className="custom-scrollbar">
+    <div id="categories" className="custom-scrollbar fade-up">
       <h4>Top Categories</h4>
       <DataTable
         columns={columns}
