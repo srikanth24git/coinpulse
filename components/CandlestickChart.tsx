@@ -215,53 +215,6 @@ const CandlestickChart = ({
     candleSeriesRef.current.update(converted);
   }, [livePrice, mode]);
 
-  // useEffect(() => {
-  //   if (!livePrice) return;
-  //   if (!candleSeriesRef.current) return;
-
-  //   const now = Math.floor(Date.now() / 1000);
-
-  //   // first update
-  //   if (!latestCandleRef.current) {
-  //     latestCandleRef.current = [
-  //       now * 1000,
-  //       livePrice,
-  //       livePrice,
-  //       livePrice,
-  //       livePrice,
-  //     ];
-
-  //     previousPriceRef.current = livePrice;
-
-  //     candleSeriesRef.current.update({
-  //       time: now as UTCTimestamp,
-  //       open: livePrice,
-  //       high: livePrice,
-  //       low: livePrice,
-  //       close: livePrice,
-  //     });
-
-  //     return;
-  //   }
-
-  //   const candle = latestCandleRef.current;
-
-  //   candle[2] = Math.max(candle[2], livePrice); // high
-  //   candle[3] = Math.min(candle[3], livePrice); // low
-  //   candle[4] = livePrice; // close
-
-  //   candleSeriesRef.current.update({
-  //     time: Math.floor(candle[0] / 1000) as UTCTimestamp,
-  //     open: candle[1],
-  //     high: candle[2],
-  //     low: candle[3],
-  //     close: candle[4],
-  //   });
-  //   chartRef.current?.timeScale().scrollToRealTime();
-
-  //   previousPriceRef.current = livePrice;
-  // }, [livePrice]);
-
   useEffect(() => {
     if (mode !== "live") return;
 
