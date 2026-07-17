@@ -7,6 +7,8 @@ import CoinsPagination from "@/components/CoinsPagination";
 
 import { cn, formatPercentage, formatCurrency } from "@/lib/utils";
 
+import WatchlistButton from "@/components/WatchlistButton";
+
 const Coins = async ({ searchParams }: NextPageProps) => {
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
@@ -24,18 +26,14 @@ const Coins = async ({ searchParams }: NextPageProps) => {
 
   const columns: DataTableColumn<CoinMarketData>[] = [
     {
+      header: "⭐",
+      cell: (coin) => <WatchlistButton coinId={coin.id} />,
+    },
+
+    {
       header: "Rank",
       cellClassName: "rank-cell",
-      cell: (coin) => (
-        <>
-          #{coin.market_cap_rank}
-          <Link
-            href={`/coins/${coin.id}`}
-            aria-label="View coin"
-            className="transition hover:scale-[1.02]"
-          />
-        </>
-      ),
+      cell: (coin) => <>#{coin.market_cap_rank}</>,
     },
     {
       header: "Token",
@@ -84,6 +82,9 @@ const Coins = async ({ searchParams }: NextPageProps) => {
 
   const estimatedTotalPages =
     currentPage >= 100 ? Math.ceil(currentPage / 100) * 100 + 100 : 100;
+
+  console.log("Columns length:", columns.length);
+  console.log(columns.map((c) => c.header));
 
   return (
     <main id="coins-page">
